@@ -68,6 +68,14 @@ server.on('login', (client) => {
     chat(server, client, packet);
   });
 
+  client.on('ext_info', (packet) => {
+    if (packet.app_name !== 'ClassiCube 1.2.5') {
+      client.write('disconnect_player', {
+        disconnect_reason: 'Custom client (bannable) or old version. Update.',
+      });
+    }
+  });
+
   client.on('set_block', (packet) => {
     if (packet.mode === 0) {
       packet.block_type = 0;
