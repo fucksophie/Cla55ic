@@ -6,7 +6,7 @@ module.exports = (server, client, args) => {
 		if(args.length == 1) {
 			if(config.ops.includes(args[0])) {
 				client.write("message", {
-					player_id: -1,
+					player_id: 0,
 					message: `Deopped ${args[0]}`
 				})
 
@@ -16,19 +16,19 @@ module.exports = (server, client, args) => {
 				fs.writeFileSync("config.json", JSON.stringify(config, null, "\t"))
 			} else {
 				client.write("message", {
-					player_id: -1,
+					player_id: 0,
 					message: `Player is not opped.`
 				})
 			}
 		} else {
 			client.write("message", {
-				player_id: -1,
+				player_id: 0,
 				message: `Missing argument.`
 			})
 		}
 	} else {
 		client.write("message", {
-			player_id: -1,
+			player_id: 0,
 			message: `You are not opped.`
 		})
 	}

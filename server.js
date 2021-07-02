@@ -1,23 +1,20 @@
 const mc = require("minecraft-classic-protocol");
-const cpe = require('minecraft-classic-protocol-extension');
 
 const crypto = require("crypto")
-const fs = require("fs")
 
 const { handleLogin, startHeartbeat } = require("./utils/onlinemode");
 const chat = require("./utils/chat");
 const World = require("./utils/world");
 const values = require("./utils/values");
+const cpe = require("./utils/cpe"); 
 
 const server = mc.createServer({ 
     port: 25565,
-    customPackets: cpe.protocol
+    customPackets: require('minecraft-classic-protocol-extension').protocol
 })
 
 server.players = [];
 server.hash = crypto.randomBytes(16).toString('hex');
-
-const version = fs.readFileSync(".git\\refs\\heads\\main").slice(0, 7)
 
 const world = new World({
     x: 256,
@@ -33,10 +30,10 @@ server.on("login", client => {
     if(client.identification_byte == 0x42) {
         client.cpe = true;
 
-        client.write('ext_info', {
-            app_name: `Cla55ic ${version}`,
-            extension_count: 0 
-        });
+        cpe.sendInfo(client)
+        cpe.registerEntries(client)
+        cpe.registerColors(client)
+        cpe.writeHeaders(client)
     }
 
     server.players.push(client)

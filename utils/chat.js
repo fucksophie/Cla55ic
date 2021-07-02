@@ -12,7 +12,7 @@ module.exports = (server,client, message) => {
 			require("./commands/"+command)(server, client, args)
 		} else {
 			client.write("message", {
-				player_id: -1,
+				player_id: 0,
 				message: "Command not found."
 			})
 		}
@@ -20,7 +20,7 @@ module.exports = (server,client, message) => {
 		server.players.forEach(player => {
 			player.write("message", {
 				player_id: server.players.indexOf(player),
-				message: client.username + "> " + content
+				message: client.username + "> " + content.replace("%", "&")
 			})
 		})
 	}
