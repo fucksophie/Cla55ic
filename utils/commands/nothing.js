@@ -1,6 +1,6 @@
-module.exports = (server, client, args) => {
-	client.write("message", {
-		player_id: 0,
-		message: "Hello"
-	})
-}
+module.exports = (server, client) => {
+  client.write('message', {
+    player_id: 0,
+    message: 'Hello',
+  });
+};
