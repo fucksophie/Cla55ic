@@ -41,7 +41,7 @@ server.on('login', (client) => {
 
   console.log(`User connected! Now connected ${server.players.length}!`);
 
-  world.send_packets(client);
+  world.sendPackets(client);
 
   client.write('spawn_player', {
     ...values.defaultSpawn,
