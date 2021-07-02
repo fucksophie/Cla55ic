@@ -85,9 +85,8 @@ server.on('login', (client) => {
       player.write('player_teleport', packet);
     });
   });
-  function handleLeave(err) {
-    if (!err) console.log(`User left! Now connected ${server.players.length}!`);
 
+  function handleLeave(err) {
     server.players.forEach((player) => {
       if (player !== client) {
         player.write('despawn_player', {
@@ -98,6 +97,8 @@ server.on('login', (client) => {
 
     server.players = server.players.filter((e) => e !== client);
     world.save();
+
+    if (!err) console.log(`User left! Now connected ${server.players.length}!`);
   }
 
   client.on('error', () => handleLeave(true));

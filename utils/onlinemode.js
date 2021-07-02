@@ -12,9 +12,10 @@ function handleLogin(server, client) {
       return;
     }
 
-    if (server.players.map((e) => e.username).includes(client.username)) {
-      client.write('disconnect_player', {
-        disconnect_reason: 'Duplicate name!',
+    const players = server.players.map((e) => e.username);
+    if (players.includes(client.username)) {
+      server.players[players.indexOf(client.username)].write('disconnect_player', {
+        disconnect_reason: 'Somebody joined with your exact name!',
       });
     }
   }
