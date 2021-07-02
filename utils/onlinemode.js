@@ -26,7 +26,6 @@ function handleLogin(server, client) {
 function startHeartbeat(server) {
 	if(config["online-mode"]) {
 		setInterval(() => {
-			console.log("sent heartbeat")
 			request('https://www.classicube.net/heartbeat.jsp' +
 				`?port=${server.socketServer.address().port}` +
 				'&max=255'+
