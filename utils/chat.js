@@ -19,7 +19,7 @@ module.exports = (server,client, message) => {
 	} else {
 		server.players.forEach(player => {
 			player.write("message", {
-				player_id: server.players.indexOf(player),
+				player_id: 0,
 				message: client.username + "> " + content.replace("%", "&")
 			})
 		})
