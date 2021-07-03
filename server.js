@@ -82,10 +82,11 @@ server.on('login', (client) => {
     }
 
     const dx = (client.position.x / 32) - packet.x;
+    const dy = (client.position.y / 32) - packet.y;
     const dz = (client.position.y / 32) - packet.y;
-    const diff = Math.sqrt(dx * dx + dz * dz);
+    const diff = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
-    if (diff > 6) {
+    if (diff > 7) {
       client.write('disconnect_player', {
         disconnect_reason: 'Detected reach.',
       });
