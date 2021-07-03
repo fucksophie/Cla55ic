@@ -19,6 +19,15 @@ function registerEntries(client) {
     version: 1,
     ext_name: 'TextColors',
   });
+
+  client.write('ext_entry', {
+    version: 1,
+    ext_name: 'CustomBlocks',
+  });
+
+  client.write('custom_block_support_level', {
+    support_level: 1,
+  });
 }
 
 function writeHeaders(client) {
