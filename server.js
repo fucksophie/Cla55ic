@@ -11,7 +11,7 @@ const cpe = require('./utils/cpe');
 
 const server = mc.createServer({
   port: 25565,
-  customPackets: require('minecraft-classic-protocol-extension').protocol,
+  customPackets: require('./cpe.json'),
 });
 
 server.players = [];
@@ -35,11 +35,19 @@ server.on('login', (client) => {
     cpe.registerEntries(client);
     cpe.registerColors(client);
     cpe.writeHeaders(client);
+    cpe.registerEvents(client);
   }
 
   server.players.push(client);
 
   console.log(`User connected! Now connected ${server.players.length}!`);
+
+  server.players.forEach((player) => {
+    player.write('message', {
+      player_id: 0,
+      message: `&${client.cpe ? 'p' : 'a'}${client.username} joined!`,
+    });
+  });
 
   world.sendPackets(client);
 
@@ -73,6 +81,17 @@ server.on('login', (client) => {
       packet.block_type = 0;
     }
 
+    const dx = (client.position.x / 32) - packet.x;
+    const dz = (client.position.y / 32) - packet.y;
+    const diff = Math.sqrt(dx * dx + dz * dz);
+
+    if (diff > 6) {
+      client.write('disconnect_player', {
+        disconnect_reason: 'Detected reach.',
+      });
+      return;
+    }
+
     world.setBlock(packet, packet.block_type);
     server.players.forEach((player) => {
       player.write('set_block', packet);
@@ -84,24 +103,37 @@ server.on('login', (client) => {
       packet.player_id = server.players.indexOf(client);
       player.write('player_teleport', packet);
     });
+
+    client.position = packet;
   });
 
   function handleLeave(err) {
-    server.players.forEach((player) => {
-      if (player !== client) {
-        player.write('despawn_player', {
-          player_id: server.players.indexOf(client),
+    if (!err) {
+      server.players.forEach((player) => {
+        if (player !== client) {
+          player.write('despawn_player', {
+            player_id: server.players.indexOf(client),
+          });
+        }
+      });
+
+      server.players = server.players.filter((e) => e !== client);
+      world.save();
+
+      console.log(`User left! Now connected ${server.players.length}!`);
+
+      server.players.forEach((player) => {
+        player.write('message', {
+          player_id: 0,
+          message: `&${client.cpe ? 'r' : 'c'}${client.username} left!`,
         });
-      }
-    });
-
-    server.players = server.players.filter((e) => e !== client);
-    world.save();
-
-    if (!err) console.log(`User left! Now connected ${server.players.length}!`);
+      });
+    } else {
+      console.log(`Player ${client.username} experienced error: ${err}`);
+    }
   }
 
-  client.on('error', () => handleLeave(true));
+  client.on('error', (e) => handleLeave(e));
   client.on('end', handleLeave);
 });
 
