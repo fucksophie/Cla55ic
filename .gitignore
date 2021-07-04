@@ -1,3 +1,4 @@
 node_modules
 worlds/*
 config.json
+data/

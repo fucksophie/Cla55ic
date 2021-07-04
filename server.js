@@ -1,5 +1,6 @@
 /* eslint-disable no-param-reassign, no-console, global-require */
 const mc = require('minecraft-classic-protocol');
+const Josh = require('@joshdb/core');
 
 const crypto = require('crypto');
 
@@ -17,6 +18,11 @@ const server = mc.createServer({
 server.players = [];
 server.hash = crypto.randomBytes(16).toString('hex');
 
+server.db = new Josh({
+  name: 'Cla55ic',
+  provider: require('@joshdb/sqlite'),
+});
+
 const world = new World({
   x: 256,
   y: 20,
@@ -25,8 +31,15 @@ const world = new World({
 
 startHeartbeat(server);
 
-server.on('login', (client) => {
+server.on('login', async (client) => {
   handleLogin(server, client);
+
+  if (!(await server.db.get(client.username))) {
+    await server.db.set(client.username, {
+      tag: '',
+      rank: '',
+    });
+  }
 
   if (client.identification_byte === 0x42) {
     client.cpe = true;

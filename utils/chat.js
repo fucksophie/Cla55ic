@@ -2,7 +2,7 @@ const fs = require('fs');
 
 const commands = fs.readdirSync('utils/commands').map((e) => e.split('.js')[0].toLowerCase());
 
-module.exports = (server, client, message) => {
+module.exports = async (server, client, message) => {
   const content = message.message;
 
   if (content.startsWith('/')) {
@@ -19,10 +19,21 @@ module.exports = (server, client, message) => {
       });
     }
   } else {
-    server.players.forEach((player) => {
+    const dbPlayer = await server.db.get(client.username);
+    let chat = `${client.username}: ${content.replace(/%/gm, '&')}`;
+
+    if (dbPlayer.tag) {
+      chat = `<${dbPlayer.tag}&f> ${chat}`;
+    }
+
+    if (dbPlayer.rank) {
+      chat = `[${dbPlayer.rank}&f] ${chat}`;
+    }
+
+    server.players.forEach(async (player) => {
       player.write('message', {
         player_id: 0,
-        message: `${client.username}> ${content.replace('%', '&')}`,
+        message: chat,
       });
     });
   }
