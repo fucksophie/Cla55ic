@@ -7,7 +7,7 @@ const config = require('../config.json');
 function sendInfo(client) {
   client.write('ext_info', {
     app_name: `Cla55ic ${version}`,
-    extension_count: 2,
+    extension_count: 3,
   });
 }
 
