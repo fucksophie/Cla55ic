@@ -9,6 +9,7 @@ module.exports = (server, client, args) => {
           disconnect_reason: 'You were kicked by a operator.',
         });
 
+        server.players[players.indexOf(args[0])].socket.destroy();
         client.write('message', {
           player_id: 0,
           message: `Kicked ${args[0]}!`,

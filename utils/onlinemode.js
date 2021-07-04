@@ -9,6 +9,7 @@ function handleLogin(server, client) {
         disconnect_reason: 'Refresh your Server List! Username could not be verified!',
       });
 
+      client.socket.destroy();
       return;
     }
 
@@ -17,6 +18,8 @@ function handleLogin(server, client) {
       server.players[players.indexOf(client.username)].write('disconnect_player', {
         disconnect_reason: 'Somebody joined with your exact name!',
       });
+
+      server.players[players.indexOf(client.username)].socket.destroy();
     }
   }
 }
