@@ -90,34 +90,41 @@ server.on('login', async (client) => {
   });
 
   client.on('set_block', (packet) => {
-    if (packet.mode === 0) {
-      packet.block_type = 0;
-    }
+    if (client.position) {
+      if (packet.mode === 0) {
+        packet.block_type = 0;
+      }
 
-    const previousBlock = world.getBlock(packet);
+      const previousBlock = world.getBlock(packet);
 
-    const dx = (client.position.x / 32) - packet.x;
-    const dy = (client.position.y / 32) - packet.y;
-    const dz = (client.position.z / 32) - packet.z;
-    const diff = Math.sqrt(dx * dx + dy * dy + dz * dz);
+      const dx = (client.position.x / 32) - packet.x;
+      const dy = (client.position.y / 32) - packet.y;
+      const dz = (client.position.z / 32) - packet.z;
+      const diff = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
-    if (diff > 7) {
-      client.write('set_block', {
-        ...packet,
-        block_type: previousBlock,
+      if (diff > 7) {
+        client.write('set_block', {
+          ...packet,
+          block_type: previousBlock,
+        });
+
+        client.write('message', {
+          player_id: 0,
+          message: `Your block could not be ${packet.mode ? 'placed' : 'removed'}.`,
+        });
+        return;
+      }
+
+      world.setBlock(packet, packet.block_type);
+      server.players.forEach((player) => {
+        player.write('set_block', packet);
       });
-
+    } else {
       client.write('message', {
         player_id: 0,
-        message: `Your block could not be ${packet.mode ? 'placed' : 'removed'}.`,
+        message: 'Move before placing a block.',
       });
-      return;
     }
-
-    world.setBlock(packet, packet.block_type);
-    server.players.forEach((player) => {
-      player.write('set_block', packet);
-    });
   });
 
   client.on('position', (packet) => {
