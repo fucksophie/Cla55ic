@@ -81,14 +81,22 @@ server.on('login', (client) => {
       packet.block_type = 0;
     }
 
+    const previousBlock = world.getBlock(packet);
+
     const dx = (client.position.x / 32) - packet.x;
     const dy = (client.position.y / 32) - packet.y;
     const dz = (client.position.z / 32) - packet.z;
     const diff = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
-    if (diff > 6) {
-      client.write('disconnect_player', {
-        disconnect_reason: 'Detected reach.',
+    if (diff > 7) {
+      client.write('set_block', {
+        ...packet,
+        block_type: previousBlock,
+      });
+
+      client.write('message', {
+        player_id: 0,
+        message: `Your block could not be ${packet.mode ? 'placed' : 'removed'}.`,
       });
       return;
     }
