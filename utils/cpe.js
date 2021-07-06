@@ -7,7 +7,7 @@ const config = require('../config.json');
 function sendInfo(client) {
   client.write('ext_info', {
     app_name: `Cla55ic ${version}`,
-    extension_count: 3,
+    extension_count: 4,
   });
 }
 
@@ -25,6 +25,11 @@ function registerEntries(client) {
   client.write('ext_entry', {
     version: 1,
     ext_name: 'CustomBlocks',
+  });
+
+  client.write('ext_entry', {
+    version: 1,
+    ext_name: 'TextHotKey',
   });
 }
 
@@ -68,6 +73,13 @@ function registerEvents(client) {
     if (client.extension_count === client.extensions.length) {
       client.write('custom_block_support_level', {
         support_level: 1,
+      });
+
+      client.write('set_text_hotkey', {
+        label: 'crouch',
+        action: '/crouch\n',
+        keycode: 42,
+        keymods: 0,
       });
     }
   });
