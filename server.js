@@ -9,6 +9,7 @@ const chat = require('./utils/chat');
 const World = require('./utils/world');
 const values = require('./utils/values');
 const cpe = require('./utils/cpe');
+const Integrations = require("./utils/integrations")
 
 const server = mc.createServer({
   port: 25565,
@@ -17,6 +18,8 @@ const server = mc.createServer({
 
 server.players = [];
 server.hash = crypto.randomBytes(16).toString('hex');
+
+server.integrations = new Integrations(server);
 
 server.db = new Josh({
   name: 'Cla55ic',

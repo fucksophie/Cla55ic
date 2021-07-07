@@ -7,5 +7,15 @@
 		"I love &pyourfriend",
 		"He's &rlarge..",
 		"nya"
-	]
+	],
+	"irc": {
+		"enabled": true,
+		"username": "myserver",
+		"channel": "#myserver",
+		"server": {
+			"ip": "irc.myserver.net",
+			"port": "1337",
+			"secure": true
+		}
+	}
 }
