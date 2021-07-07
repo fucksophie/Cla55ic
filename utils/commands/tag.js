@@ -8,7 +8,7 @@ module.exports = async (server, client, args) => {
         player_id: 0,
         message: 'Tag is bigger than 6, or smaller than 2.',
       });
-    } else {
+    } else if ((tag.length / nocolors.length) < 4) {
       const dbPlayer = await server.db.get(client.username);
 
       dbPlayer.tag = tag;
@@ -18,6 +18,11 @@ module.exports = async (server, client, args) => {
       client.write('message', {
         player_id: 0,
         message: `Applied tag ${tag}!`,
+      });
+    } else {
+      client.write('message', {
+        player_id: 0,
+        message: `Actual text to color ratio is weird. Use less colors or more text!`,
       });
     }
   } else {
