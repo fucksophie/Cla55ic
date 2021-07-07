@@ -7,7 +7,7 @@ const config = require('../config.json');
 function sendInfo(client) {
   client.write('ext_info', {
     app_name: `Cla55ic ${version}`,
-    extension_count: 4,
+    extension_count: 5,
   });
 }
 
@@ -30,6 +30,11 @@ function registerEntries(client) {
   client.write('ext_entry', {
     version: 1,
     ext_name: 'TextHotKey',
+  });
+  
+  client.write('ext_entry', {
+    version: 1,
+    ext_name: 'LongerMessages',
   });
 }
 

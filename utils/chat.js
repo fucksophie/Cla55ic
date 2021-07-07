@@ -1,9 +1,25 @@
 const fs = require('fs');
 
 const commands = fs.readdirSync('utils/commands').map((e) => e.split('.js')[0].toLowerCase());
+const parital = {}
 
 module.exports = async (server, client, message) => {
-  const content = message.message;
+  let content;
+
+  if(message.unused == 1) {
+    if(!parital[client.username]) parital[client.username] = "";
+    parital[client.username] += message.message + " "
+
+    return;
+  } else {
+    if(parital[client.username]) {
+      content = parital[client.username] + " " + message.message;
+
+      parital[client.username] = ""
+    } else {
+      content = message.message;
+    }
+  }
 
   if (content.startsWith('/')) {
     const args = content.split(' ');
@@ -31,6 +47,17 @@ module.exports = async (server, client, message) => {
     }
 
     server.integrations.handleMCChat(client, content)
+
+    while (chat.length > 64) {
+        server.players.forEach(async (player) => {
+          player.write('message', {
+            player_id: 0,
+            message: chat.substring(0, 64),
+          });
+        });
+
+        chat = chat.substring(64)
+    }
 
     server.players.forEach(async (player) => {
       player.write('message', {
