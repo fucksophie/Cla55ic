@@ -13,11 +13,22 @@ class Integrations {
 		});
 
 		this.irc.addListener('message', (from, to, message) => {
-			this.handleIRC(from, message);
+			this.handleIRCChat(from, message);
+		})
+
+		
+		this.irc.addListener('part', (channel, nick) => {
+			if(nick == config.irc.username) return;
+			this.handleIRCEL(nick, false);
+		})
+
+		this.irc.addListener('join', (channel, nick) => {
+			if(nick == config.irc.username) return;
+			this.handleIRCEL(nick, true);
 		})
 	}
 
-	handleIRC(from, message) {
+	handleIRCChat(from, message) {
 		if(!config.irc.enabled) return;
 
 		this.server.players.forEach(async (player) => {
@@ -28,7 +39,24 @@ class Integrations {
 		});
 	}
 
-	handleMC(client, message) {
+	handleIRCEL(from, state) {
+		if(!config.irc.enabled) return;
+
+		this.server.players.forEach(async (player) => {
+			player.write('message', {
+			  player_id: 0,
+			  message: `[&rIRC&f] ${from} ${state ? "entered" : "left"}`,
+			});
+		});
+	}
+
+	handleMCEL(client, state) {
+		if(!config.irc.enabled) return;
+		
+		this.irc.say(config.irc.channel, `[CC] ${client.username} ${state ? "entered" : "left"}`);
+	}
+
+	handleMCChat(client, message) {
 		if(!config.irc.enabled) return;
 		
 		this.irc.say(config.irc.channel, `[CC] ${client.username}: ${message.replace(/%./gm, '')}`)

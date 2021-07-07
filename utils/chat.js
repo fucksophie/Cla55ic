@@ -30,7 +30,7 @@ module.exports = async (server, client, message) => {
       chat = `[${dbPlayer.rank}&f] ${chat}`;
     }
 
-    server.integrations.handleMC(client, content)
+    server.integrations.handleMCChat(client, content)
 
     server.players.forEach(async (player) => {
       player.write('message', {

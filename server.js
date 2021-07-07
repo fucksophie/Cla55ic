@@ -57,7 +57,7 @@ server.on('login', async (client) => {
   server.players.push(client);
 
   console.log(`User connected! Now connected ${server.players.length}!`);
-
+  server.integrations.handleMCEL(client, true);
   server.players.forEach((player) => {
     player.write('message', {
       player_id: 0,
@@ -153,7 +153,7 @@ server.on('login', async (client) => {
       world.save();
 
       console.log(`User left! Now connected ${server.players.length}!`);
-
+      server.integrations.handleMCEL(client, false);
       server.players.forEach((player) => {
         player.write('message', {
           player_id: 0,
