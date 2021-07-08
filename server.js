@@ -13,7 +13,7 @@ const Integrations = require("./utils/integrations")
 
 const server = mc.createServer({
   port: 25565,
-  customPackets: require('./cpe.json'),
+  customPackets: require("minecraft-classic-protocol-extension").protocol,
 });
 
 server.players = [];
