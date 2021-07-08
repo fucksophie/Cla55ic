@@ -26,11 +26,15 @@ server.db = new Josh({
   provider: require('@joshdb/sqlite'),
 });
 
-const world = new World({
+server.world = new World({
   x: 256,
-  y: 20,
+  y: 128,
   z: 256,
 }, 'worlds/default.buf');
+
+values.defaultSpawn.x = Math.floor(server.world.size.x / 2) * 32
+values.defaultSpawn.y = (Math.floor(server.world.size.y / 2) * 32) + 32;
+values.defaultSpawn.z = Math.floor(server.world.size.z / 2) * 32
 
 startHeartbeat(server);
 
@@ -65,7 +69,7 @@ server.on('login', async (client) => {
     });
   });
 
-  world.sendPackets(client);
+  server.world.sendPackets(client);
 
   client.write('spawn_player', {
     ...values.defaultSpawn,
@@ -98,7 +102,7 @@ server.on('login', async (client) => {
         packet.block_type = 0;
       }
 
-      const previousBlock = world.getBlock(packet);
+      const previousBlock = server.world.getBlock(packet);
 
       const dx = (client.position.x / 32) - packet.x;
       const dy = (client.position.y / 32) - packet.y;
@@ -118,7 +122,7 @@ server.on('login', async (client) => {
         return;
       }
 
-      world.setBlock(packet, packet.block_type);
+      server.world.setBlock(packet, packet.block_type);
       server.players.forEach((player) => {
         player.write('set_block', packet);
       });
@@ -150,10 +154,12 @@ server.on('login', async (client) => {
       });
 
       server.players = server.players.filter((e) => e !== client);
-      world.save();
+      server.world.save();
 
       console.log(`User left! Now connected ${server.players.length}!`);
+
       server.integrations.handleMCEL(client, false);
+      
       server.players.forEach((player) => {
         player.write('message', {
           player_id: 0,

@@ -1,8 +1,6 @@
 const fs = require('fs');
 const zlib = require('zlib');
 
-// code base taken from Dazed-sheep, but a lot rewritten.
-
 class World {
   constructor(size, file) {
     this.size = size;
@@ -39,8 +37,8 @@ class World {
   }
 
   setLayer(y, type) {
-    for (let i = 0; i < 256; i += 1) {
-      for (let b = 0; b < 256; b += 1) {
+    for (let i = 0; i < this.size.z; i += 1) {
+      for (let b = 0; b < this.size.x; b += 1) {
         this.setBlock({
           x: b,
           y,
