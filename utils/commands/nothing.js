@@ -1,6 +1,8 @@
+const chat = require('../chat');
+
 module.exports = (server, client) => {
   client.write('message', {
     player_id: 0,
-    message: 'Hello',
+    message: chat.cp437("♪"),
   });
 };

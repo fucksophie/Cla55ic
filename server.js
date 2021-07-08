@@ -93,7 +93,7 @@ server.on('login', async (client) => {
   });
 
   client.on('message', (packet) => {
-    chat(server, client, packet);
+    chat.handle(server, client, packet);
   });
 
   client.on('set_block', (packet) => {
