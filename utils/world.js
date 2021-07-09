@@ -32,6 +32,17 @@ class World {
     return this.data.readUInt8(4 + pos.x + this.size.z * (pos.z + this.size.x * pos.y));
   }
 
+  getSpawn() {
+    return {
+      player_id: -1,
+      x: Math.floor(this.size.x / 2) * 32,
+      y: (Math.floor(this.size.y / 2) * 32) + 32,
+      z: Math.floor(this.size.z / 2) * 32,
+      yaw: 0,
+      pitch: 0,
+    };
+  }
+
   dump() {
     return this.data;
   }

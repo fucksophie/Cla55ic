@@ -7,7 +7,6 @@ const crypto = require('crypto');
 const { handleLogin, startHeartbeat } = require('./utils/onlinemode');
 const chat = require('./utils/chat');
 const World = require('./utils/world');
-const values = require('./utils/values');
 const cpe = require('./utils/cpe');
 const Integrations = require('./utils/integrations');
 
@@ -26,20 +25,17 @@ server.db = new Josh({
   provider: require('@joshdb/sqlite'),
 });
 
-server.world = new World({
+const world = new World({
   x: 256,
   y: 128,
   z: 256,
 }, 'worlds/default.buf');
 
-values.defaultSpawn.x = Math.floor(server.world.size.x / 2) * 32;
-values.defaultSpawn.y = (Math.floor(server.world.size.y / 2) * 32) + 32;
-values.defaultSpawn.z = Math.floor(server.world.size.z / 2) * 32;
-
 startHeartbeat(server);
 
 server.on('login', async (client) => {
   handleLogin(server, client);
+  client.world = world;
 
   if (!(await server.db.get(client.username))) {
     await server.db.set(client.username, {
@@ -69,23 +65,23 @@ server.on('login', async (client) => {
     });
   });
 
-  server.world.sendPackets(client);
+  client.world.sendPackets(client);
 
   client.write('spawn_player', {
-    ...values.defaultSpawn,
+    ...client.world.getSpawn(),
     player_name: client.username,
   });
 
   server.players.forEach((player) => {
-    if (player !== client) {
+    if (player !== client && player.world.file === client.world.file) {
       player.write('spawn_player', {
-        ...values.defaultSpawn,
+        ...client.world.getSpawn(),
         player_id: server.players.length - 1,
         player_name: client.username,
       });
 
       client.write('spawn_player', {
-        ...values.defaultSpawn,
+        ...client.world.getSpawn(),
         player_id: server.players.indexOf(player),
         player_name: player.username,
       });
@@ -102,7 +98,7 @@ server.on('login', async (client) => {
         packet.block_type = 0;
       }
 
-      const previousBlock = server.world.getBlock(packet);
+      const previousBlock = client.world.getBlock(packet);
 
       const dx = (client.position.x / 32) - packet.x;
       const dy = (client.position.y / 32) - packet.y;
@@ -122,9 +118,12 @@ server.on('login', async (client) => {
         return;
       }
 
-      server.world.setBlock(packet, packet.block_type);
+      client.world.setBlock(packet, packet.block_type);
+
       server.players.forEach((player) => {
-        player.write('set_block', packet);
+        if (player.world.file === client.world.file) {
+          player.write('set_block', packet);
+        }
       });
     } else {
       client.write('message', {
@@ -136,8 +135,10 @@ server.on('login', async (client) => {
 
   client.on('position', (packet) => {
     server.players.forEach((player) => {
-      packet.player_id = server.players.indexOf(client);
-      player.write('player_teleport', packet);
+      if (player.world.file === client.world.file) {
+        packet.player_id = server.players.indexOf(client);
+        player.write('player_teleport', packet);
+      }
     });
 
     client.position = packet;
@@ -154,7 +155,7 @@ server.on('login', async (client) => {
       });
 
       server.players = server.players.filter((e) => e !== client);
-      server.world.save();
+      client.world.save();
 
       console.log(`User left! Now connected ${server.players.length}!`);
 
