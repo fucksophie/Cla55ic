@@ -1,7 +1,7 @@
-const config = require('../../config.json');
-
-module.exports = async (server, client, args) => {
-  if (config.ops.includes(client.username)) {
+module.exports = {
+  description: 'Give a rank to a player',
+  onlyOP: true,
+  run: async (server, client, args) => {
     if (args.length >= 2) {
       const username = args[0];
       args.shift();
@@ -36,10 +36,5 @@ module.exports = async (server, client, args) => {
         message: 'Missing arguments.',
       });
     }
-  } else {
-    client.write('message', {
-      player_id: 0,
-      message: 'You are not opped.',
-    });
-  }
+  },
 };

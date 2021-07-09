@@ -1,7 +1,7 @@
-const config = require('../../config.json');
-
-module.exports = (server, client, args) => {
-  if (config.ops.includes(client.username)) {
+module.exports = {
+  description: 'Kick a player',
+  onlyOP: true,
+  run: (server, client, args) => {
     if (args.length === 1) {
       const players = server.players.map((e) => e.username);
       if (players.includes(args[0])) {
@@ -21,10 +21,5 @@ module.exports = (server, client, args) => {
         message: 'Missing argument.',
       });
     }
-  } else {
-    client.write('message', {
-      player_id: 0,
-      message: 'You are not opped.',
-    });
-  }
+  },
 };

@@ -1,8 +1,10 @@
 const fs = require('fs');
 const config = require('../../config.json');
 
-module.exports = (server, client, args) => {
-  if (config.ops.includes(client.username)) {
+module.exports = {
+  description: 'Deop a player',
+  onlyOP: true,
+  run: (server, client, args) => {
     if (args.length === 1) {
       if (config.ops.includes(args[0])) {
         client.write('message', {
@@ -26,10 +28,5 @@ module.exports = (server, client, args) => {
         message: 'Missing argument.',
       });
     }
-  } else {
-    client.write('message', {
-      player_id: 0,
-      message: 'You are not opped.',
-    });
-  }
+  },
 };

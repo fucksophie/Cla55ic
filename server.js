@@ -9,11 +9,11 @@ const chat = require('./utils/chat');
 const World = require('./utils/world');
 const values = require('./utils/values');
 const cpe = require('./utils/cpe');
-const Integrations = require("./utils/integrations")
+const Integrations = require('./utils/integrations');
 
 const server = mc.createServer({
   port: 25565,
-  customPackets: require("minecraft-classic-protocol-extension").protocol,
+  customPackets: require('minecraft-classic-protocol-extension').protocol,
 });
 
 server.players = [];
@@ -32,9 +32,9 @@ server.world = new World({
   z: 256,
 }, 'worlds/default.buf');
 
-values.defaultSpawn.x = Math.floor(server.world.size.x / 2) * 32
+values.defaultSpawn.x = Math.floor(server.world.size.x / 2) * 32;
 values.defaultSpawn.y = (Math.floor(server.world.size.y / 2) * 32) + 32;
-values.defaultSpawn.z = Math.floor(server.world.size.z / 2) * 32
+values.defaultSpawn.z = Math.floor(server.world.size.z / 2) * 32;
 
 startHeartbeat(server);
 
@@ -159,7 +159,7 @@ server.on('login', async (client) => {
       console.log(`User left! Now connected ${server.players.length}!`);
 
       server.integrations.handleMCEL(client, false);
-      
+
       server.players.forEach((player) => {
         player.write('message', {
           player_id: 0,
