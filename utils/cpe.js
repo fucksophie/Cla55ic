@@ -31,7 +31,7 @@ function registerEntries(client) {
     version: 1,
     ext_name: 'TextHotKey',
   });
-  
+
   client.write('ext_entry', {
     version: 1,
     ext_name: 'LongerMessages',
