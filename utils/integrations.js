@@ -1,66 +1,97 @@
-const upd = require("irc-upd")
+const upd = require('irc-upd');
+const Discord = require('discord.js');
 const config = require('../config.json');
 
 class Integrations {
-	constructor(server) {
-		if(!config.irc.enabled) return;
-		
-		this.server = server;
-		this.irc = new upd.Client(config.irc.server.ip, config.irc.username, {
-			channels: [config.irc.channel],
-			secure: config.irc.channel,
-			port: config.irc.server.port,
-		});
+  constructor(server) {
+    this.server = server;
 
-		this.irc.addListener('message', (from, to, message) => {
-			this.handleIRCChat(from, message);
-		})
+    if (config.discord.enabled) {
+      this.discord = new Discord.Client();
 
-		
-		this.irc.addListener('part', (channel, nick) => {
-			if(nick == config.irc.username) return;
-			this.handleIRCEL(nick, false);
-		})
+      this.discord.on('ready', () => {
+        this.discordChannel = this.discord.channels.cache.get(config.discord.id);
+      });
+      this.discord.on('message', (message) => {
+        if (message.author.bot) return;
 
-		this.irc.addListener('join', (channel, nick) => {
-			if(nick == config.irc.username) return;
-			this.handleIRCEL(nick, true);
-		})
-	}
+        this.server.players.forEach(async (player) => {
+          player.write('message', {
+            player_id: 0,
+            message: `[&rDISCORD&f] ${message.author.username}&f: ${message.content}`,
+          });
+        });
 
-	handleIRCChat(from, message) {
-		if(!config.irc.enabled) return;
+        if (config.irc.enabled) {
+          this.irc.say(config.irc.channel, `[DISCORD] ${message.author.username}: ${message.content}`);
+        }
+      });
 
-		this.server.players.forEach(async (player) => {
-			player.write('message', {
-			  player_id: 0,
-			  message: `[&rIRC&f] ${from}&f: ${message}`,
-			});
-		});
-	}
+      this.discord.login(config.discord.token);
+    }
 
-	handleIRCEL(from, state) {
-		if(!config.irc.enabled) return;
+    if (config.irc.enabled) {
+      this.irc = new upd.Client(config.irc.server.ip, config.irc.username, {
+        channels: [config.irc.channel],
+        secure: config.irc.channel,
+        port: config.irc.server.port,
+      });
 
-		this.server.players.forEach(async (player) => {
-			player.write('message', {
-			  player_id: 0,
-			  message: `[&rIRC&f] ${from} ${state ? "entered" : "left"}`,
-			});
-		});
-	}
+      this.irc.addListener('message', (from, to, message) => {
+        this.server.players.forEach(async (player) => {
+          player.write('message', {
+            player_id: 0,
+            message: `[&rIRC&f] ${from}&f: ${message}`,
+          });
+        });
 
-	handleMCEL(client, state) {
-		if(!config.irc.enabled) return;
-		
-		this.irc.say(config.irc.channel, `[CC] ${client.username} ${state ? "entered" : "left"}`);
-	}
+        if (config.discord.enabled) {
+          this.discordChannel.send(`[IRC] ${from}: ${message}`);
+        }
+      });
 
-	handleMCChat(client, message) {
-		if(!config.irc.enabled) return;
-		
-		this.irc.say(config.irc.channel, `[CC] ${client.username}: ${message.replace(/%./gm, '')}`)
-	} 
+      this.irc.addListener('part', (channel, nick) => {
+        this.handleIRCEL(nick, false);
+      });
+
+      this.irc.addListener('join', (channel, nick) => {
+        this.handleIRCEL(nick, true);
+      });
+    }
+  }
+
+  handleIRCEL(from, state) {
+    this.server.players.forEach(async (player) => {
+      player.write('message', {
+        player_id: 0,
+        message: `[&rIRC&f] ${from} ${state ? 'entered' : 'left'}`,
+      });
+    });
+
+    if (config.discord.enabled) {
+      this.discordChannel.send(`[IRC] ${from} ${state ? 'entered' : 'left'}`);
+    }
+  }
+
+  handleMCEL(client, state) {
+    if (config.discord.enabled) {
+      this.discordChannel.send(`[CC] ${client.username} ${state ? 'entered' : 'left'}`);
+    }
+
+    if (config.irc.enabled) {
+      this.irc.say(config.irc.channel, `[CC] ${client.username} ${state ? 'entered' : 'left'}`);
+    }
+  }
+
+  handleMCChat(client, message) {
+    if (config.discord.enabled) {
+      this.discordChannel.send(`[CC] ${client.username}: ${message.replace(/%./gm, '')}`);
+    }
+
+    if (config.irc.enabled) {
+      this.irc.say(config.irc.channel, `[CC] ${client.username}: ${message.replace(/%./gm, '')}`);
+    }
+  }
 }
 
 module.exports = Integrations;
