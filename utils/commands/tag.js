@@ -1,5 +1,5 @@
 module.exports = {
-  description: 'Give a tag to a player',
+  description: 'Give yourself a tag, the <portion>',
   onlyOP: false,
   run: async (server, client, args) => {
     if (args.length >= 1) {

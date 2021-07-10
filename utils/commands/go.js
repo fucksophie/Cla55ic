@@ -2,7 +2,7 @@ const fs = require('fs');
 const World = require('../world');
 
 module.exports = {
-  description: 'Kick a player',
+  description: 'Go to a world.',
   onlyOP: false,
   run: (server, client, args) => {
     if (args.length === 1) {

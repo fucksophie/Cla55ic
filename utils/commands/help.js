@@ -4,7 +4,7 @@ const fs = require('fs');
 const commands = fs.readdirSync(__dirname).map((e) => ({ name: e.slice(0, -3), command: require(`${__dirname}/${e}`) }));
 
 module.exports = {
-  description: 'Placeholder command.',
+  description: 'Get all of the commands of Cla55ic',
   onlyOP: false,
   run: (server, client) => {
     client.write('message', {
