@@ -14,7 +14,7 @@ class Integrations {
       });
       this.discord.on('message', (message) => {
         if (message.author.bot) return;
-
+        if (message.channel.id !== config.discord.id) return;
         this.server.players.forEach(async (player) => {
           player.write('message', {
             player_id: 0,
