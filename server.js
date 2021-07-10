@@ -67,6 +67,15 @@ server.on('login', async (client) => {
 
   client.world.sendPackets(client);
 
+  client.write('hack_control', {
+    flying: 0,
+    no_clip: 0,
+    speeding: 0,
+    spawn_control: 0,
+    third_person_view: 0,
+    jump_height: -1,
+  });
+
   client.write('spawn_player', {
     ...client.world.getSpawn(),
     player_name: client.username,
@@ -105,7 +114,7 @@ server.on('login', async (client) => {
       const dz = (client.position.z / 32) - packet.z;
       const diff = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
-      if (diff > 7) {
+      if (diff > 7 && client.world.file === world.file) {
         client.write('set_block', {
           ...packet,
           block_type: previousBlock,

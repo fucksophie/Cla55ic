@@ -30,6 +30,15 @@ module.exports = {
           y: 128,
           z: 256,
         }, 'worlds/default.buf');
+
+        client.write('hack_control', {
+          flying: 0,
+          no_clip: 0,
+          speeding: 0,
+          spawn_control: 0,
+          third_person_view: 0,
+          jump_height: -1,
+        });
       } else {
         // eslint-disable-next-line no-param-reassign
         client.world = new World({
@@ -37,6 +46,14 @@ module.exports = {
           y: 128,
           z: 256,
         }, `worlds/custom/${args[0]}.buf`);
+        client.write('hack_control', {
+          flying: 1,
+          no_clip: 1,
+          speeding: 1,
+          spawn_control: 1,
+          third_person_view: 1,
+          jump_height: -1,
+        });
       }
 
       client.world.sendPackets(client);
